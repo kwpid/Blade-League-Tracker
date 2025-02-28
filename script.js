@@ -313,16 +313,30 @@ function displayStats(data) {
     statsPopup.style.display = "flex"; // Show the popup
 }
 
-// Handle search button click or Enter key press
 async function handleSearch() {
     const userId = userIdInput.value.trim();
     if (!userId) return alert("Please enter a User ID");
 
-    const stats = await fetchPlayerStats(userId);
-    if (stats) {
-        displayStats(stats);
-    } else {
-        alert("No stats found for this user.");
+    // Disable the button and show loading animation
+    searchButton.textContent = "";
+    searchButton.classList.add("loading");
+    searchButton.disabled = true;
+
+    try {
+        const stats = await fetchPlayerStats(userId);
+        if (stats) {
+            displayStats(stats);
+        } else {
+            alert("No stats found for this user.");
+        }
+    } catch (error) {
+        console.error("Error fetching stats:", error);
+        alert("Failed to fetch stats. Please try again.");
+    } finally {
+        // Re-enable the button and revert to "Search"
+        searchButton.textContent = "Search";
+        searchButton.classList.remove("loading");
+        searchButton.disabled = false;
     }
 }
 
