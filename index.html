@@ -51,6 +51,7 @@
             </div>
         </div>
     </div>
+          
 </section>
 
         <section id="ranks" class="tab-content">
@@ -133,13 +134,13 @@
     </main>
 <div id="statsPopup" class="popup">
     <div class="popup-content">
-      <span class="close">&times;</span>
-      <h2>Player Stats</h2>
-      <div id="statsContainer">
-        <!-- Stats will be dynamically inserted here -->
-      </div>
+        <span class="close">&times;</span>
+        <h2>Player Stats</h2>
+        <div id="statsContainer">
+            <!-- Stats will be dynamically inserted here -->
+        </div>
     </div>
-  </div>
+</div>
     <footer>
         <p>&copy; 2025 Blade League Tracker. All rights reserved.</p>
       
@@ -205,7 +206,7 @@ nav ul li {
     background-color: #1e1e1e;
     padding: 24px;
     border-radius: 10px;
-    width: 400px;
+    width: 600px; /* Increased width for better layout */
     max-width: 90%;
     text-align: center;
     position: relative;
@@ -228,13 +229,43 @@ nav ul li {
 
 .stats-container {
     margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.user-info {
+    background-color: #2a2a2a;
+    border-radius: 8px;
+    padding: 16px;
+    text-align: left;
+}
+
+.user-info h2 {
+    margin-top: 0;
+    color: #fe585c;
+}
+
+.user-info p {
+    margin: 8px 0;
+    font-size: 16px;
+    color: #ffffff;
+}
+
+.queue-stats {
+    display: flex;
+    gap: 16px;
+    justify-content: space-between;
+    flex-wrap: wrap;
 }
 
 .queue-container {
     background-color: #2a2a2a;
     border-radius: 8px;
     padding: 16px;
-    margin: 12px 0;
+    flex: 1 1 calc(33.333% - 32px); /* Three columns with gap */
+    min-width: 200px;
+    text-align: left;
 }
 
 .queue-container h3 {
