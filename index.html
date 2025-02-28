@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blade League Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="icon" href="https://cdn.glitch.global/885e1375-80f6-4ceb-91b8-c7d1fb3ec83e/2025_02_27_0r7_Kleki.png?v=1740691195185" type="image/png">
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="#" class="nav-tab" data-tab="home">Home</a></li>
+              <li><a href="#" class="nav-tab" data-tab="leaderboards">Leaderboards</a></li>
+                <li><a href="#" class="nav-tab" data-tab="ranks">Ranks</a></li>
+  
+                <li><a href="#" class="nav-tab">Support</a></li>
+                <li><a href="#" class="nav-tab" data-tab="tournaments">Tournaments</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="home" class="tab-content active">
+            <div class="banner">
+                <h1>Welcome to Blade League Tracker</h1>
+                <p>This is a concept website for a game on ROBLOX called Blade League.</p>
+            </div>
+          <div class="container">
+   <div class="container">
+    <h1>Player Stats Lookup</h1>
+    <input type="text" id="userIdInput" placeholder="Enter User ID (Discord ID)">
+    <button id="searchButton">Search</button>
+  </div>
+  </div>
+          
+        </section>
+
+        <section id="ranks" class="tab-content">
+            <h1>Ranks</h1>
+            <div class="tabs">
+                <button class="tab-button active" onclick="openSubTab(event, 'info')">Info</button>
+                <button class="tab-button" onclick="openSubTab(event, 'distribution')">Rank Distribution</button>
+            </div>
+
+            <div id="info" class="sub-tab-content active">
+                <h2>Info</h2>
+                <p>Ranking system is currently ELO based.</p>
+            </div>
+
+            <div id="distribution" class="sub-tab-content">
+                <h2>Rank Distribution</h2>
+                <table id="distribution-table">
+                    <thead>
+                        <tr>
+                            <th>Icon</th>
+                            <th>Rank</th>
+                            <th>MMR Range (Min-Max)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- JS will populate this -->
+                    </tbody>
+                </table>
+                <canvas id="bellCurveChart" width="400" height="200"></canvas>
+            </div>
+        </section>
+      
+<section id="leaderboards" class="tab-content">
+    <!-- Leaderboard Tabs -->
+    <div class="leaderboard-tabs">
+        <button class="leaderboard-tab-button active" data-leaderboard="1v1">1v1 Leaderboard</button>
+        <button class="leaderboard-tab-button" data-leaderboard="2v2">2v2 Leaderboard</button>
+        <button class="leaderboard-tab-button" data-leaderboard="3v3">3v3 Leaderboard</button>
+    </div>
+
+    <!-- Leaderboard Content -->
+    <div id="leaderboard-1v1" class="leaderboard-content active">
+        <div class="leaderboard-scrollable">
+            <ul id="leaderboard-list-1v1">Loading...</ul>
+        </div>
+    </div>
+    <div id="leaderboard-2v2" class="leaderboard-content">
+        <div class="leaderboard-scrollable">
+            <ul id="leaderboard-list-2v2">Loading...</ul>
+        </div>
+    </div>
+    <div id="leaderboard-3v3" class="leaderboard-content">
+        <div class="leaderboard-scrollable">
+            <ul id="leaderboard-list-3v3">Loading...</ul>
+        </div>
+    </div>
+</section>
+
+        <section id="tournaments" class="tab-content">
+            <h1>Tournament Information</h1>
+            <div class="tabs">
+                <button class="tab-button active" onclick="openSubTab(event, 'tournament-info')">Info</button>
+                <button class="tab-button" onclick="openSubTab(event, 'tournament-active')">Teams</button>
+            </div>
+
+            <div id="tournament-info" class="sub-tab-content active">
+                <h2>Tournament Info</h2>
+               <p>
+                WIP.
+              </p>
+            </div>
+
+            <div id="tournament-active" class="sub-tab-content">
+                <h2>Teams</h2>
+                <p>WIP.</p>
+            </div>
+
+  
+        </section>
+    </main>
+<div id="statsPopup" class="popup">
+    <div class="popup-content">
+      <span class="close">&times;</span>
+      <h2>Player Stats</h2>
+      <div id="statsContainer">
+        <!-- Stats will be dynamically inserted here -->
+      </div>
+    </div>
+  </div>
+    <footer>
+        <p>&copy; 2025 Blade League Tracker. All rights reserved.</p>
+      
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
+
+
+
+<style>
+/* General Styles */
+body {
+    background-color: #121212;
+    color: #E0E0E0;
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+}
+
+a {
+    color: #fe585c;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: #ff7f7f;
+}
+
+/* Header */
+header {
+    background-color: #1A1A1A;
+    padding: 20px 0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+nav ul {
+    display: flex;
+    justify-content: center;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+nav ul li {
+    margin: 0 20px;
+}
+
+nav ul li a {
+    color: #E0E0E0;
+    text-decoration: none;
+    font-weight: 700;
+    transition: color 0.3s ease;
+}
+
+nav ul li a:hover, nav ul li a.active {
+    color: #fe585c;
+}
+
+/* Main Content */
+main {
+    padding: 40px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+h1, h2 {
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #fe585c;
+}
+
+.tab-content {
+    display: none;
+    padding: 20px;
+    background-color: #1A1A1A;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    margin-top: 20px;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Tabs */
+.tabs {
+    display: flex;
+    justify-content: flex-start;
+    border-bottom: 2px solid #333333;
+    margin-bottom: 20px;
+}
+
+.tab-button {
+    background-color: transparent;
+    color: #E0E0E0;
+    border: none;
+    padding: 15px 25px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 700;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.tab-button.active, .tab-button:hover {
+    background-color: #fe585c;
+    color: #0D0D0D;
+}
+
+/* Tables */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    padding: 15px;
+    text-align: center;
+}
+
+th {
+    background-color: #333333;
+    color: #fe585c;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+td {
+    background-color: #262626;
+    color: #E0E0E0;
+}
+
+tbody tr:hover {
+    background-color: #333333;
+    transition: background-color 0.3s ease;
+}
+/* Leaderboards */
+.leaderboard-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.leaderboard-tab-button {
+    background-color: #333;
+    color: #E0E0E0;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 700;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.leaderboard-tab-button.active, .leaderboard-tab-button:hover {
+    background-color: #fe585c;
+    color: #0D0D0D;
+}
+
+.leaderboard-content {
+    display: none;
+    background: #1e1e1e;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.leaderboard-content.active {
+    display: block;
+}
+
+.leaderboard-scrollable {
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 10px;
+    background-color: #262626;
+    border-radius: 8px;
+}
+
+.leaderboard-scrollable ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.leaderboard-scrollable li {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px;
+    border-bottom: 1px solid #333;
+    font-size: 18px;
+    transition: background-color 0.3s ease;
+}
+
+.leaderboard-scrollable li:last-child {
+    border-bottom: none;
+}
+
+.leaderboard-scrollable li:hover {
+    background-color: #333;
+}
+
+.leaderboard-scrollable li span {
+    flex: 1;
+    text-align: left;
+}
+
+.leaderboard-scrollable li span:last-child {
+    text-align: right;
+    color: #fe585c;
+    font-weight: 700;
+}
+
+/* Add a subtle animation for the leaderboard items */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.leaderboard-scrollable li {
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* Popup */
+.popup {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.popup-content {
+    background-color: #1e1e1e;
+    padding: 24px;
+    border-radius: 10px;
+    width: 400px;
+    max-width: 90%;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #ffffff;
+    transition: color 0.3s ease;
+}
+
+.close:hover {
+    color: #fe585c;
+}
+
+/* Footer */
+footer {
+    background-color: #1A1A1A;
+    color: #E0E0E0;
+    text-align: center;
+    padding: 20px;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* Input and Buttons */
+#userIdInput {
+    width: 50%;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    border: 2px solid #fe585c;
+    border-radius: 5px;
+    background-color: #333333;
+    color: #E0E0E0;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+#userIdInput:focus {
+    border-color: #ff7f7f;
+}
+
+#searchButton {
+    background-color: #fe585c;
+    color: #ffffff;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#searchButton:hover {
+    background-color: #ff7f7f;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const distributionData = [
+        { icon: 'https://cdn.glitch.global/c16ac13c-9db1-4fbb-a599-4c729f45d485/21405196-dbc9-4527-91e7-9a41abc6a698.image.png?v=1724335671471', rank: "Rank Placeholder", divisions: ["1,000", "INF"] },
+      { icon: 'https://cdn.glitch.global/c16ac13c-9db1-4fbb-a599-4c729f45d485/21405196-dbc9-4527-91e7-9a41abc6a698.image.png?v=1724335671471', rank: "Rank Placeholder", divisions: ["865", "999"] },
+    ];
+
+    const tableBody = document.querySelector('#distribution-table tbody');
+    distributionData.forEach(row => {
+        const tr = document.createElement('tr');
+        const iconTd = document.createElement('td');
+        const rankTd = document.createElement('td');
+        const divisionsTd = document.createElement('td');
+
+        const img = document.createElement('img');
+        img.src = row.icon;
+        img.alt = `${row.rank} icon`;
+        img.className = 'rank-icon';
+
+        iconTd.appendChild(img);
+        rankTd.textContent = row.rank;
+        divisionsTd.textContent = `${row.divisions[0]} — ${row.divisions[1]}`;
+  
+
+        tr.appendChild(iconTd);
+        tr.appendChild(rankTd);
+        tr.appendChild(divisionsTd);
+
+        tableBody.appendChild(tr);
+    });
+
+    // Function to handle tab switching
+    function openTab(event, tabName) {
+        const tabContents = document.querySelectorAll('.tab-content');
+        const navTabs = document.querySelectorAll('.nav-tab');
+
+        tabContents.forEach(content => {
+            content.classList.remove('active');
+        });
+
+        navTabs.forEach(tab => {
+            tab.classList.remove('active');
+        });
+
+        document.getElementById(tabName).classList.add('active');
+        event.currentTarget.classList.add('active');
+
+        // Show the first sub-tab by default
+        const firstSubTab = document.querySelector(`#${tabName} .tab-button`);
+        if (firstSubTab) {
+            firstSubTab.click();
+        }
+    }
+
+    // Function to handle sub-tab switching
+    function openSubTab(event, subTabName) {
+        const subTabContents = event.currentTarget.closest('.tab-content').querySelectorAll('.sub-tab-content');
+        const tabButtons = event.currentTarget.closest('.tabs').querySelectorAll('.tab-button');
+
+        subTabContents.forEach(content => {
+            content.classList.remove('active');
+        });
+
+        tabButtons.forEach(button => {
+            button.classList.remove('active');
+        });
+
+        document.getElementById(subTabName).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+
+    // Attach event listeners to navigation tabs
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+        tab.addEventListener('click', function(event) {
+            event.preventDefault();
+            openTab(event, tab.getAttribute('data-tab'));
+        });
+    });
+
+    // Attach event listeners to sub-tab buttons
+    document.querySelectorAll('.tab-button').forEach(button => {
+        button.addEventListener('click', function(event) {
+            openSubTab(event, button.getAttribute('onclick').match(/'([^']+)'/)[1]);
+        });
+    });
+
+    // Default to showing the first tab content
+    openTab({ currentTarget: document.querySelector('.nav-tab') }, 'home');
+});
+
+async function fetchLeaderboard(url, listId) {
+    try {
+        const response = await fetch(url, {
+            headers: { 'accept': 'application/json' }
+        });
+        const data = await response.json();
+        
+        const list = document.getElementById(listId);
+        list.innerHTML = '';
+        
+        if (data.alltime && Array.isArray(data.alltime)) {
+            const sortedData = data.alltime.sort((a, b) => b.data.mmr - a.data.mmr);
+            sortedData.forEach((entry, index) => {
+                const listItem = document.createElement('li');
+                listItem.innerHTML = `
+                    <span>${index + 1}. ${entry.name}</span>
+                    <span>${Math.round(entry.data.mmr)} MMR</span>
+                `;
+                list.appendChild(listItem);
+            });
+        } else {
+            list.textContent = 'No leaderboard data available';
+        }
+    } catch (error) {
+        console.error('Error fetching leaderboard:', error);
+        document.getElementById(listId).textContent = 'Failed to load leaderboard';
+    }
+}
+
+  document.addEventListener('DOMContentLoaded', function () {
+    // Function to switch leaderboard tabs
+    function switchLeaderboardTab(event) {
+        const tabButtons = document.querySelectorAll('.leaderboard-tab-button');
+        const tabContents = document.querySelectorAll('.leaderboard-content');
+
+        // Remove active class from all buttons and content
+        tabButtons.forEach(button => button.classList.remove('active'));
+        tabContents.forEach(content => content.classList.remove('active'));
+
+        // Add active class to the clicked button and corresponding content
+        const targetTab = event.currentTarget.getAttribute('data-leaderboard');
+        event.currentTarget.classList.add('active');
+        document.getElementById(`leaderboard-${targetTab}`).classList.add('active');
+    }
+
+    // Attach event listeners to leaderboard tab buttons
+    document.querySelectorAll('.leaderboard-tab-button').forEach(button => {
+        button.addEventListener('click', switchLeaderboardTab);
+    });
+
+    // Default to showing the 1v1 leaderboard
+    document.querySelector('.leaderboard-tab-button[data-leaderboard="1v1"]').click();
+});
+
+
+  document.addEventListener('DOMContentLoaded', function () {
+    // Function to switch leaderboard tabs
+    function switchLeaderboardTab(event) {
+        const tabButtons = document.querySelectorAll('.leaderboard-tab-button');
+        const tabContents = document.querySelectorAll('.leaderboard-content');
+
+        // Remove active class from all buttons and content
+        tabButtons.forEach(button => button.classList.remove('active'));
+        tabContents.forEach(content => content.classList.remove('active'));
+
+        // Add active class to the clicked button and corresponding content
+        const targetTab = event.currentTarget.getAttribute('data-leaderboard');
+        event.currentTarget.classList.add('active');
+        document.getElementById(`leaderboard-${targetTab}`).classList.add('active');
+    }
+
+    // Attach event listeners to leaderboard tab buttons
+    document.querySelectorAll('.leaderboard-tab-button').forEach(button => {
+        button.addEventListener('click', switchLeaderboardTab);
+    });
+
+    // Default to showing the 1v1 leaderboard
+    document.querySelector('.leaderboard-tab-button[data-leaderboard="1v1"]').click();
+});
+// API base URL
+const API_BASE_URL = "https://api.neatqueue.com/api/playerstats/1220373185397264425";
+
+// DOM elements
+const userIdInput = document.getElementById("userIdInput");
+const searchButton = document.getElementById("searchButton");
+const statsPopup = document.getElementById("statsPopup");
+const statsContainer = document.getElementById("statsContainer");
+const closePopup = document.querySelector(".close");
+
+// Fetch player stats
+async function fetchPlayerStats(userId, queue) {
+  const url = `${API_BASE_URL}/${userId}/${queue}`;
+  const headers = {
+    accept: "application/json",
+    Authorization: "8n8twaWcZ_SHV3oJor_jgY1SJmfIdP9e",
+  };
+
+  try {
+    const response = await fetch(url, { headers });
+    if (!response.ok) throw new Error("Failed to fetch stats");
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching stats:", error);
+    return null;
+  }
+}
+
+// Display stats in the popup
+function displayStats(stats) {
+  statsContainer.innerHTML = ""; // Clear previous stats
+
+  const queues = ["1v1-Solo", "2v2-Duos", "3v3-Trios"];
+  queues.forEach((queue) => {
+    const queueStats = stats[queue];
+    if (queueStats) {
+      const queueContainer = document.createElement("div");
+      queueContainer.className = "queue-container";
+
+      queueContainer.innerHTML = `
+        <h3>${queue}</h3>
+        <p><strong>MMR:</strong> ${Math.ceil(queueStats.mmr)}</p>
+        <p><strong>Wins:</strong> ${Math.ceil(queueStats.wins)}</p>
+        <p><strong>Losses:</strong> ${Math.ceil(queueStats.losses)}</p>
+        <p><strong>Streak:</strong> ${Math.ceil(queueStats.streak)}</p>
+        <p><strong>Total Games:</strong> ${Math.ceil(queueStats.totalgames)}</p>
+        <p><strong>Peak MMR:</strong> ${Math.ceil(queueStats.peak_mmr)}</p>
+        <p><strong>Peak Streak:</strong> ${Math.ceil(queueStats.peak_streak)}</p>
+      `;
+
+      statsContainer.appendChild(queueContainer);
+    }
+  });
+
+  statsPopup.style.display = "flex"; // Show the popup
+}
+
+// Handle search button click or Enter key press
+async function handleSearch() {
+  const userId = userIdInput.value.trim();
+  if (!userId) return alert("Please enter a User ID");
+
+  const stats = {};
+  const queues = ["1v1-Solo", "2v2-Duos", "3v3-Trios"];
+
+  for (const queue of queues) {
+    const queueStats = await fetchPlayerStats(userId, queue);
+    if (queueStats) stats[queue] = queueStats;
+  }
+
+  displayStats(stats);
+}
+
+// Event listeners
+searchButton.addEventListener("click", handleSearch);
+userIdInput.addEventListener("keypress", (e) => {
+  if (e.key === "Enter") handleSearch();
+});
+closePopup.addEventListener("click", () => {
+  statsPopup.style.display = "none";
+});
+
+// Fetch data for all leaderboards
+fetchLeaderboard('https://api.neatqueue.com/api/leaderboard/1220373185397264425/1344081250125742173', 'leaderboard-list-1v1'); // 1v1
+fetchLeaderboard('https://api.neatqueue.com/api/leaderboard/1220373185397264425/1344081252025892904', 'leaderboard-list-2v2'); // 2v2
+fetchLeaderboard('https://api.neatqueue.com/api/leaderboard/1220373185397264425/1344089470672044092', 'leaderboard-list-3v3'); // 3v3
+
+fetchLeaderboard();
+</script>
+<script src="stats.js"></script>
