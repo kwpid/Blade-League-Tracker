@@ -25,19 +25,33 @@
 
     <main>
         <section id="home" class="tab-content active">
-            <div class="banner">
-                <h1>Welcome to Blade League Tracker</h1>
-                <p>This is a concept website for a game on ROBLOX called Blade League.</p>
+    <div class="banner">
+        <h1>Welcome to Blade League Tracker</h1>
+        <p>This is a concept website for a game on ROBLOX called Blade League.</p>
+    </div>
+    <div class="container">
+        <h1>Player Stats Lookup</h1>
+        <input type="text" id="userIdInput" placeholder="Enter User ID (Discord ID)">
+        <button id="searchButton">Search</button>
+    </div>
+    <div class="suggestions">
+        <h2>What would you like to do?</h2>
+        <div class="suggestion-cards">
+            <div class="card" data-tab="leaderboards">
+                <h3>Check Leaderboards</h3>
+                <p>See top players in 1v1, 2v2, and 3v3 modes.</p>
             </div>
-          <div class="container">
-   <div class="container">
-    <h1>Player Stats Lookup</h1>
-    <input type="text" id="userIdInput" placeholder="Enter User ID (Discord ID)">
-    <button id="searchButton">Search</button>
-  </div>
-  </div>
-          
-        </section>
+            <div class="card" data-tab="ranks">
+                <h3>View Rank Info</h3>
+                <p>Learn about the ranking system and distribution.</p>
+            </div>
+            <div class="card" data-tab="tournaments">
+                <h3>Tournament Info</h3>
+                <p>Get the latest on upcoming tournaments.</p>
+            </div>
+        </div>
+    </div>
+</section>
 
         <section id="ranks" class="tab-content">
             <h1>Ranks</h1>
@@ -139,31 +153,27 @@
 
 
 <style>
-/* General Styles */
 body {
-    background-color: #121212;
+    background-color: #0D0D0D;
     color: #E0E0E0;
     font-family: 'Roboto', sans-serif;
     margin: 0;
     padding: 0;
-    line-height: 1.6;
 }
-
-a {
-    color: #fe585c;
-    text-decoration: none;
-    transition: color 0.3s ease;
+footer {
+    background-color: #1A1A1A;
+    color: #E0E0E0;
+    text-align: center;
+    padding: 20px;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.3);
 }
-
-a:hover {
-    color: #ff7f7f;
-}
-
-/* Header */
 header {
     background-color: #1A1A1A;
-    padding: 20px 0;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    padding: 20px;
 }
 
 nav ul {
@@ -177,21 +187,82 @@ nav ul {
 nav ul li {
     margin: 0 20px;
 }
+/* Popup styles */
+.popup {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
 
+.popup-content {
+    background-color: #1e1e1e;
+    padding: 24px;
+    border-radius: 10px;
+    width: 400px;
+    max-width: 90%;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #ffffff;
+    transition: color 0.3s ease;
+}
+
+.close:hover {
+    color: #fe585c;
+}
+
+.stats-container {
+    margin-top: 20px;
+}
+
+.queue-container {
+    background-color: #2a2a2a;
+    border-radius: 8px;
+    padding: 16px;
+    margin: 12px 0;
+}
+
+.queue-container h3 {
+    margin-top: 0;
+    margin-bottom: 12px;
+    font-size: 20px;
+    color: #fe585c;
+}
+
+.queue-container p {
+    margin: 8px 0;
+    font-size: 16px;
+    color: #ffffff;
+}
 nav ul li a {
     color: #E0E0E0;
     text-decoration: none;
     font-weight: 700;
-    transition: color 0.3s ease;
+    transition: color 0.3s;
 }
 
 nav ul li a:hover, nav ul li a.active {
     color: #fe585c;
+    text-decoration: underline;
 }
 
-/* Main Content */
 main {
-    padding: 40px 20px;
+    padding: 40px;
     max-width: 1200px;
     margin: 0 auto;
 }
@@ -199,23 +270,8 @@ main {
 h1, h2 {
     font-weight: 700;
     text-transform: uppercase;
-    color: #fe585c;
 }
 
-.tab-content {
-    display: none;
-    padding: 20px;
-    background-color: #1A1A1A;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    margin-top: 20px;
-}
-
-.tab-content.active {
-    display: block;
-}
-
-/* Tabs */
 .tabs {
     display: flex;
     justify-content: flex-start;
@@ -231,15 +287,39 @@ h1, h2 {
     cursor: pointer;
     font-size: 16px;
     font-weight: 700;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition: background-color 0.3s, color 0.3s;
 }
 
-.tab-button.active, .tab-button:hover {
+.tab-button.active {
     background-color: #fe585c;
     color: #0D0D0D;
 }
 
-/* Tables */
+.tab-button:hover {
+    background-color: #fe585c;
+    color: #0D0D0D;
+}
+
+.tab-content {
+    display: none; /* Hide all sections by default */
+    padding: 20px;
+    background-color: #1A1A1A;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+}
+
+.tab-content.active {
+    display: block; /* Show the active section */
+}
+
+.sub-tab-content {
+    display: none; /* Hide all sub-tabs by default */
+}
+
+.sub-tab-content.active {
+    display: block; /* Show the active sub-tab */
+}
+
 table {
     width: 100%;
     border-collapse: collapse;
@@ -263,9 +343,111 @@ td {
     color: #E0E0E0;
 }
 
+tbody tr:nth-child(odd) {
+    background-color: #1A1A1A;
+}
+
+.rank-icon {
+    width: 40px;
+    height: 40px;
+}
+
 tbody tr:hover {
     background-color: #333333;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s;
+}
+#searchBar {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #333;
+    background-color: #1A1A1A;
+    color: #E0E0E0;
+}
+
+#profileList {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.profile {
+    display: flex;
+    flex-direction: column;
+    background-color: #1A1A1A;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.profile-header img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+}
+
+.profile-header h2 {
+    font-size: 20px;
+    margin: 0;
+}
+
+.profile-header p {
+    font-size: 14px;
+    color: #888;
+}
+
+.profile-mmr {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.mmr-title {
+    padding: 10px 15px;
+    border-radius: 5px;
+    color: #fff;
+    font-weight: 700;
+    text-align: center;
+}
+  
+.legend {
+    background: linear-gradient(90deg, #ff00ff, #000000);
+}
+
+.grand-champion {
+    background: linear-gradient(90deg, #ff0000, #000000);
+}
+
+.champion {
+    background: linear-gradient(90deg, #ff7f00, #000000);
+}
+
+.diamond {
+    background: linear-gradient(90deg, #00ccff, #000000);
+}
+
+.platinum {
+    background: linear-gradient(90deg, #00ff00, #000000);
+}
+
+.gold {
+    background: linear-gradient(90deg, #ffd700, #000000);
+}
+
+.silver {
+    background: linear-gradient(90deg, #c0c0c0, #000000);
+}
+
+.bronze {
+    background: linear-gradient(90deg, #cd7f32, #000000);
 }
 /* Leaderboards */
 .leaderboard-tabs {
@@ -361,89 +543,67 @@ tbody tr:hover {
 .leaderboard-scrollable li {
     animation: fadeIn 0.5s ease-out;
 }
+  #userIdInput {
+            width: 50%;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            border: 2px solid #fe585c;
+            border-radius: 5px;
+           background-color: #333333;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
 
-/* Popup */
-.popup {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
+        #userIdInput:focus {
+            border-color: #fe585c;
+          color: white;
+        }
 
-.popup-content {
-    background-color: #1e1e1e;
-    padding: 24px;
-    border-radius: 10px;
-    width: 400px;
-    max-width: 90%;
+        #searchButton {
+            background-color: #fe585c;
+            color: #ffffff;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #searchButton:hover {
+            background-color: #e04a4e;
+        }
+  .suggestions {
+    margin-top: 2rem;
     text-align: center;
-    position: relative;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
-.close {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    font-size: 24px;
+.suggestion-cards {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 1rem;
+}
+
+.card {
+    background-color: #262626;
+    padding: 1rem;
+    border-radius: 10px;
+    width: 30%;
     cursor: pointer;
-    color: #ffffff;
-    transition: color 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.close:hover {
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 8px rgba(254, 88, 92, 0.2);
+}
+
+.card h3 {
     color: #fe585c;
 }
 
-/* Footer */
-footer {
-    background-color: #1A1A1A;
+.card p {
     color: #E0E0E0;
-    text-align: center;
-    padding: 20px;
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.3);
-}
-
-/* Input and Buttons */
-#userIdInput {
-    width: 50%;
-    padding: 0.75rem;
-    margin-bottom: 1rem;
-    border: 2px solid #fe585c;
-    border-radius: 5px;
-    background-color: #333333;
-    color: #E0E0E0;
-    font-size: 1rem;
-    outline: none;
-    transition: border-color 0.3s ease;
-}
-
-#userIdInput:focus {
-    border-color: #ff7f7f;
-}
-
-#searchButton {
-    background-color: #fe585c;
-    color: #ffffff;
-    border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 5px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-#searchButton:hover {
-    background-color: #ff7f7f;
 }
 </style>
-
