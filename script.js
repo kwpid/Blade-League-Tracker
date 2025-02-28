@@ -105,6 +105,16 @@ async function fetchLeaderboard(url, listId) {
                     <span>${index + 1}. ${entry.name}</span>
                     <span>${Math.round(entry.data.mmr)} MMR</span>
                 `;
+
+                // Apply different colors for top 3
+                if (index === 0) {
+                    listItem.querySelector('span').style.color = '#FFD700'; // Gold for #1
+                } else if (index === 1) {
+                    listItem.querySelector('span').style.color = '#C0C0C0'; // Silver for #2
+                } else if (index === 2) {
+                    listItem.querySelector('span').style.color = '#CD7F32'; // Bronze for #3
+                }
+
                 list.appendChild(listItem);
             });
         } else {
