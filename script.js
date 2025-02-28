@@ -177,86 +177,111 @@ const statsContainer = document.getElementById("statsContainer");
 const closePopup = document.querySelector(".close");
 
 // Fetch player stats
-async function fetchPlayerStats(userId, queue) {
-  const url = `${API_BASE_URL}/${userId}/${queue}`;
-  const headers = {
-    accept: "application/json",
-    Authorization: "8n8twaWcZ_SHV3oJor_jgY1SJmfIdP9e",
-  };
+async function fetchPlayerStats(userId) {
+    const url = `${API_BASE_URL}/${userId}`;
+    const headers = {
+        accept: "application/json",
+        Authorization: "Lq4-Mc-ebhFYxc6kESUYuABmDz99u9fh",
+    };
 
-  try {
-    const response = await fetch(url, { headers });
-    if (!response.ok) throw new Error("Failed to fetch stats");
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error fetching stats:", error);
-    return null;
-  }
+    try {
+        const response = await fetch(url, { headers });
+        if (!response.ok) throw new Error("Failed to fetch stats");
+        const data = await response.json();
+        return data; // Return full data to extract needed fields
+    } catch (error) {
+        console.error("Error fetching stats:", error);
+        return null;
+    }
 }
 
 // Display stats in the popup
-function displayStats(stats) {
-  statsContainer.innerHTML = ""; // Clear previous stats
+function displayStats(data) {
+    statsContainer.innerHTML = ""; // Clear previous stats
 
-  const queues = ["1v1-Solo", "2v2-Duos", "3v3-Trios"];
-  queues.forEach((queue) => {
-    const queueStats = stats[queue];
-    if (queueStats) {
-      const queueContainer = document.createElement("div");
-      queueContainer.className = "queue-container";
-
-      queueContainer.innerHTML = `
-        <h3>${queue}</h3>
-        <p><strong>MMR:</strong> ${Math.ceil(queueStats.mmr)}</p>
-        <p><strong>Wins:</strong> ${Math.ceil(queueStats.wins)}</p>
-        <p><strong>Losses:</strong> ${Math.ceil(queueStats.losses)}</p>
-        <p><strong>Streak:</strong> ${Math.ceil(queueStats.streak)}</p>
-        <p><strong>Total Games:</strong> ${Math.ceil(queueStats.totalgames)}</p>
-        <p><strong>Peak MMR:</strong> ${Math.ceil(queueStats.peak_mmr)}</p>
-        <p><strong>Peak Streak:</strong> ${Math.ceil(queueStats.peak_streak)}</p>
-      `;
-
-      statsContainer.appendChild(queueContainer);
+    if (!data) {
+        statsContainer.innerHTML = "<p>Error fetching data.</p>";
+        return;
     }
-  });
 
-  statsPopup.style.display = "flex"; // Show the popup
+    // Extract required fields
+    const { name, banned, ban_reason, last_match_end, last_winner_vote, queued, mvps, teams, ign, queues } = data;
+    const allowedQueues = ["1v1-Solo", "2v2-Duos", "3v3-Trios"];
+
+    // Display player info
+    const userInfo = document.createElement("div");
+    userInfo.className = "user-info";
+    userInfo.innerHTML = `
+        <h2>${name}</h2>
+        <p><strong>Banned:</strong> ${banned ? "Yes" : "No"}</p>
+        <p><strong>Ban Reason:</strong> ${ban_reason || "N/A"}</p>
+        <p><strong>Last Match:</strong> ${new Date(last_match_end * 1000).toLocaleString()}</p>
+        <p><strong>MVPs:</strong> ${mvps}</p>
+        <p><strong>Teams:</strong> ${teams.length > 0 ? teams.join(", ") : "None"}</p>
+    `;
+    statsContainer.appendChild(userInfo);
+
+    // Display allowed queue stats
+    const queueStatsContainer = document.createElement("div");
+    queueStatsContainer.className = "queue-stats";
+    allowedQueues.forEach((queue) => {
+        if (queues[queue]) {
+            const queueStats = queues[queue];
+            const queueContainer = document.createElement("div");
+            queueContainer.className = "queue-container";
+
+            queueContainer.innerHTML = `
+                <h3>${queue}</h3>
+                <p><strong>MMR:</strong> ${Math.ceil(queueStats.mmr)}</p>
+                <p><strong>Wins:</strong> ${Math.ceil(queueStats.wins)}</p>
+                <p><strong>Losses:</strong> ${Math.ceil(queueStats.losses)}</p>
+                <p><strong>Streak:</strong> ${Math.ceil(queueStats.streak)}</p>
+                <p><strong>Total Games:</strong> ${Math.ceil(queueStats.totalgames)}</p>
+                <p><strong>Peak MMR:</strong> ${Math.ceil(queueStats.peak_mmr)}</p>
+                <p><strong>Peak Streak:</strong> ${Math.ceil(queueStats.peak_streak)}</p>
+            `;
+            queueStatsContainer.appendChild(queueContainer);
+        }
+    });
+    statsContainer.appendChild(queueStatsContainer);
+
+    statsPopup.style.display = "flex"; // Show the popup
 }
 
 // Handle search button click or Enter key press
 async function handleSearch() {
-  const userId = userIdInput.value.trim();
-  if (!userId) return alert("Please enter a User ID");
+    const userId = userIdInput.value.trim();
+    if (!userId) return alert("Please enter a User ID");
 
-  const stats = {};
-  const queues = ["1v1-Solo", "2v2-Duos", "3v3-Trios"];
-
-  for (const queue of queues) {
-    const queueStats = await fetchPlayerStats(userId, queue);
-    if (queueStats) stats[queue] = queueStats;
-  }
-
-  displayStats(stats);
+    const stats = await fetchPlayerStats(userId);
+    if (stats) {
+        displayStats(stats);
+    } else {
+        alert("No stats found for this user.");
+    }
 }
 
 // Event listeners
 searchButton.addEventListener("click", handleSearch);
 userIdInput.addEventListener("keypress", (e) => {
-  if (e.key === "Enter") handleSearch();
+    if (e.key === "Enter") handleSearch();
 });
+
 closePopup.addEventListener("click", () => {
-  statsPopup.style.display = "none";
+    statsPopup.style.display = "none";
 });
-  document.querySelectorAll('.card').forEach(card => {
-        card.addEventListener('click', function() {
-            const tabName = card.getAttribute('data-tab');
-            const tabLink = document.querySelector(`.nav-tab[data-tab="${tabName}"]`);
-            if (tabLink) {
-                tabLink.click(); // Simulate a click on the corresponding nav tab
-            }
-        });
+
+// Tab Switching on Card Click
+document.querySelectorAll('.card').forEach(card => {
+    card.addEventListener('click', function () {
+        const tabName = card.getAttribute('data-tab');
+        const tabLink = document.querySelector(`.nav-tab[data-tab="${tabName}"]`);
+        if (tabLink) {
+            tabLink.click(); // Simulate a click on the corresponding nav tab
+        }
     });
+});
+
 
 // Fetch data for all leaderboards
 fetchLeaderboard('https://api.neatqueue.com/api/leaderboard/1220373185397264425/1344081250125742173', 'leaderboard-list-1v1'); // 1v1
