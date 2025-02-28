@@ -87,44 +87,100 @@ document.addEventListener('DOMContentLoaded', function() {
     openTab({ currentTarget: document.querySelector('.nav-tab') }, 'home');
 });
 
-async function fetchLeaderboard(url, listId) {
-    try {
-        const response = await fetch(url, {
-            headers: { 'accept': 'application/json' }
-        });
-        const data = await response.json();
-        
-        const list = document.getElementById(listId);
-        list.innerHTML = '';
-        
-        if (data.alltime && Array.isArray(data.alltime)) {
-            const sortedData = data.alltime.sort((a, b) => b.data.mmr - a.data.mmr);
-            sortedData.forEach((entry, index) => {
-                const listItem = document.createElement('li');
-                listItem.innerHTML = `
-                    <span>${index + 1}. ${entry.name}</span>
-                    <span>${Math.round(entry.data.mmr)} MMR</span>
-                `;
+document.addEventListener('DOMContentLoaded', function () {
+    const leaderboardTypeSelect = document.getElementById('leaderboard-type-select');
 
-                // Apply different colors for top 3
-                if (index === 0) {
-                    listItem.querySelector('span').style.color = '#FFD700'; // Gold for #1
-                } else if (index === 1) {
-                    listItem.querySelector('span').style.color = '#C0C0C0'; // Silver for #2
-                } else if (index === 2) {
-                    listItem.querySelector('span').style.color = '#CD7F32'; // Bronze for #3
+    // Function to fetch and display leaderboard data
+    async function fetchLeaderboard(url, listId, type) {
+        try {
+            const response = await fetch(url, {
+                headers: { 'accept': 'application/json' }
+            });
+            const data = await response.json();
+            
+            const list = document.getElementById(listId);
+            list.innerHTML = '';
+            
+            if (data.alltime && Array.isArray(data.alltime)) {
+                let sortedData;
+                if (type === 'ranked') {
+                    sortedData = data.alltime.sort((a, b) => b.data.mmr - a.data.mmr);
+                } else if (type === 'all-time') {
+                    sortedData = data.alltime.sort((a, b) => b.data.wins - a.data.wins);
                 }
 
-                list.appendChild(listItem);
-            });
-        } else {
-            list.textContent = 'No leaderboard data available';
+                sortedData.forEach((entry, index) => {
+                    const listItem = document.createElement('li');
+                    if (type === 'ranked') {
+                        listItem.innerHTML = `
+                            <span>${index + 1}. ${entry.name}</span>
+                            <span>${Math.round(entry.data.mmr)} MMR</span>
+                        `;
+                    } else if (type === 'all-time') {
+                        listItem.innerHTML = `
+                            <span>${index + 1}. ${entry.name}</span>
+                            <span>Losses: ${entry.data.losses}</span>
+                            <span>Wins: ${entry.data.wins}</span>
+                        `;
+                    }
+
+                    // Apply different colors for top 3
+                    if (index === 0) {
+                        listItem.querySelector('span').style.color = '#FFD700'; // Gold for #1
+                    } else if (index === 1) {
+                        listItem.querySelector('span').style.color = '#C0C0C0'; // Silver for #2
+                    } else if (index === 2) {
+                        listItem.querySelector('span').style.color = '#CD7F32'; // Bronze for #3
+                    }
+
+                    list.appendChild(listItem);
+                });
+            } else {
+                list.textContent = 'No leaderboard data available';
+            }
+        } catch (error) {
+            console.error('Error fetching leaderboard:', error);
+            document.getElementById(listId).textContent = 'Failed to load leaderboard';
         }
-    } catch (error) {
-        console.error('Error fetching leaderboard:', error);
-        document.getElementById(listId).textContent = 'Failed to load leaderboard';
     }
-}
+
+    // Function to switch leaderboard tabs
+    function switchLeaderboardTab(event) {
+        const tabButtons = document.querySelectorAll('.leaderboard-tab-button');
+        const tabContents = document.querySelectorAll('.leaderboard-content');
+
+        // Remove active class from all buttons and content
+        tabButtons.forEach(button => button.classList.remove('active'));
+        tabContents.forEach(content => content.classList.remove('active'));
+
+        // Add active class to the clicked button and corresponding content
+        const targetTab = event.currentTarget.getAttribute('data-leaderboard');
+        event.currentTarget.classList.add('active');
+        document.getElementById(`leaderboard-${targetTab}`).classList.add('active');
+
+        // Fetch data for the selected leaderboard type
+        const leaderboardType = leaderboardTypeSelect.value;
+        fetchLeaderboard(`https://api.neatqueue.com/api/leaderboard/1220373185397264425/1344081250125742173`, 'leaderboard-list-1v1', leaderboardType);
+        fetchLeaderboard(`https://api.neatqueue.com/api/leaderboard/1220373185397264425/1344081252025892904`, 'leaderboard-list-2v2', leaderboardType);
+        fetchLeaderboard(`https://api.neatqueue.com/api/leaderboard/1220373185397264425/1344089470672044092`, 'leaderboard-list-3v3', leaderboardType);
+    }
+
+    // Attach event listeners to leaderboard tab buttons
+    document.querySelectorAll('.leaderboard-tab-button').forEach(button => {
+        button.addEventListener('click', switchLeaderboardTab);
+    });
+
+    // Attach event listener to leaderboard type dropdown
+    leaderboardTypeSelect.addEventListener('change', () => {
+        const activeTabButton = document.querySelector('.leaderboard-tab-button.active');
+        if (activeTabButton) {
+            activeTabButton.click();
+        }
+    });
+
+    // Default to showing the 1v1 leaderboard
+    document.querySelector('.leaderboard-tab-button[data-leaderboard="1v1"]').click();
+});
 
   document.addEventListener('DOMContentLoaded', function () {
     // Function to switch leaderboard tabs
@@ -205,7 +261,6 @@ async function fetchPlayerStats(userId) {
     }
 }
 
-// Display stats in the popup
 function displayStats(data) {
     statsContainer.innerHTML = ""; // Clear previous stats
 
@@ -232,11 +287,12 @@ function displayStats(data) {
     // Display allowed queue stats
     const queueStatsContainer = document.createElement("div");
     queueStatsContainer.className = "queue-stats";
-    allowedQueues.forEach((queue) => {
+    allowedQueues.forEach((queue, index) => {
         if (queues[queue]) {
             const queueStats = queues[queue];
             const queueContainer = document.createElement("div");
             queueContainer.className = "queue-container";
+            queueContainer.style.animationDelay = `${index * 0.1}s`; // Staggered delay
 
             queueContainer.innerHTML = `
                 <h3>${queue}</h3>
@@ -291,7 +347,27 @@ document.querySelectorAll('.card').forEach(card => {
     });
 });
 
+document.addEventListener('DOMContentLoaded', function () {
+    // FAQ Button Hover Effect
+    const faqButtons = document.querySelectorAll('.faq-button');
+    faqButtons.forEach(button => {
+        button.addEventListener('mouseenter', () => {
+            button.querySelector('.arrow').style.right = '10px';
+            button.querySelector('.arrow').style.opacity = '1';
+        });
 
+        button.addEventListener('mouseleave', () => {
+            button.querySelector('.arrow').style.right = '-20px';
+            button.querySelector('.arrow').style.opacity = '0';
+        });
+
+        // Handle button click for redirection
+        button.addEventListener('click', () => {
+            const articleId = button.getAttribute('data-article-id');
+            window.location.href = `support/${articleId}.html`; // Redirect to the specific article page
+        });
+    });
+});
 // Fetch data for all leaderboards
 fetchLeaderboard('https://api.neatqueue.com/api/leaderboard/1220373185397264425/1344081250125742173', 'leaderboard-list-1v1'); // 1v1
 fetchLeaderboard('https://api.neatqueue.com/api/leaderboard/1220373185397264425/1344081252025892904', 'leaderboard-list-2v2'); // 2v2
