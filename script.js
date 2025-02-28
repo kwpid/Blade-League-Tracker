@@ -248,6 +248,15 @@ userIdInput.addEventListener("keypress", (e) => {
 closePopup.addEventListener("click", () => {
   statsPopup.style.display = "none";
 });
+  document.querySelectorAll('.card').forEach(card => {
+        card.addEventListener('click', function() {
+            const tabName = card.getAttribute('data-tab');
+            const tabLink = document.querySelector(`.nav-tab[data-tab="${tabName}"]`);
+            if (tabLink) {
+                tabLink.click(); // Simulate a click on the corresponding nav tab
+            }
+        });
+    });
 
 // Fetch data for all leaderboards
 fetchLeaderboard('https://api.neatqueue.com/api/leaderboard/1220373185397264425/1344081250125742173', 'leaderboard-list-1v1'); // 1v1
