@@ -213,8 +213,6 @@ function displayStats(data) {
     userInfo.className = "user-info";
     userInfo.innerHTML = `
         <h2>${name}</h2>
-        <p><strong>Banned:</strong> ${banned ? "Yes" : "No"}</p>
-        <p><strong>Ban Reason:</strong> ${ban_reason || "N/A"}</p>
         <p><strong>Last Match:</strong> ${new Date(last_match_end * 1000).toLocaleString()}</p>
         <p><strong>MVPs:</strong> ${mvps}</p>
         <p><strong>Teams:</strong> ${teams.length > 0 ? teams.join(", ") : "None"}</p>
@@ -232,6 +230,7 @@ function displayStats(data) {
 
             queueContainer.innerHTML = `
                 <h3>${queue}</h3>
+                <p><strong>Rank:</strong> ${Math.ceil(queueStats.rank)}</p>
                 <p><strong>MMR:</strong> ${Math.ceil(queueStats.mmr)}</p>
                 <p><strong>Wins:</strong> ${Math.ceil(queueStats.wins)}</p>
                 <p><strong>Losses:</strong> ${Math.ceil(queueStats.losses)}</p>
