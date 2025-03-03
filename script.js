@@ -1,8 +1,21 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const distributionData = [
-        { icon: 'https://cdn.glitch.global/c16ac13c-9db1-4fbb-a599-4c729f45d485/21405196-dbc9-4527-91e7-9a41abc6a698.image.png?v=1724335671471', rank: "Rank Placeholder", divisions: ["1,000", "INF"] },
-      { icon: 'https://cdn.glitch.global/c16ac13c-9db1-4fbb-a599-4c729f45d485/21405196-dbc9-4527-91e7-9a41abc6a698.image.png?v=1724335671471', rank: "Rank Placeholder", divisions: ["865", "999"] },
-    ];
+   const distributionData = [
+    { icon: "https://cdn.glitch.global/c16ac13c-9db1-4fbb-a599-4c729f45d485/c28f3b1a-1396-4f24-aec7-f289695e5695.image.png?v=1724335556235", rank: "Champion", divisions: ["1400", "INF"] },
+    { icon: "https://cdn.glitch.global/c16ac13c-9db1-4fbb-a599-4c729f45d485/07082c63-cce6-4ff1-bff3-c3fceedf2e54.image.png?v=1724335508559", rank: "Diamond III", divisions: ["1300", "1399"] },
+    { icon: "https://cdn.glitch.global/c16ac13c-9db1-4fbb-a599-4c729f45d485/76c9b43e-d0f6-4b05-9f32-7243d522c5f1.image.png?v=1724335504082", rank: "Diamond II", divisions: ["1200", "1299"] },
+    { icon: "https://cdn.glitch.global/c16ac13c-9db1-4fbb-a599-4c729f45d485/db671aad-2dd6-4328-897f-3f259be82fc5.image.png?v=1724335489836", rank: "Diamond I", divisions: ["1125", "1199"] },
+    { icon: "https://cdn.glitch.global/c16ac13c-9db1-4fbb-a599-4c729f45d485/d3a3b2fc-6fcf-4bdc-85cc-8da4f40b2993.image.png?v=1724334914955", rank: "Gold III", divisions: ["1050", "1124"] },
+    { icon: "https://cdn.glitch.global/c16ac13c-9db1-4fbb-a599-4c729f45d485/a0dedb5b-6bc3-4322-afbb-77cc07184fec.image.png?v=1724334909730", rank: "Gold II", divisions: ["975", "1049"] },
+    { icon: "https://cdn.glitch.global/c16ac13c-9db1-4fbb-a599-4c729f45d485/df499a57-8fc0-4524-bdd0-2fae76ec9301.image.png?v=1724334902060", rank: "Gold I", divisions: ["900", "974"] },
+    { icon: "https://cdn.glitch.global/c16ac13c-9db1-4fbb-a599-4c729f45d485/faa8edc7-b482-4cc4-b5b0-ceed84627079.image.png?v=1724334871163", rank: "Silver III", divisions: ["825", "899"] },
+    { icon: "https://cdn.glitch.global/c16ac13c-9db1-4fbb-a599-4c729f45d485/6caddf21-bee3-46c3-9d27-05823806cb67.image.png?v=1724334861872", rank: "Silver II", divisions: ["750", "824"] },
+    { icon: "https://cdn.glitch.global/c16ac13c-9db1-4fbb-a599-4c729f45d485/28b40287-5562-45ab-a236-5647e96f1d48.image.png?v=1724334852235", rank: "Silver I", divisions: ["675", "749"] },
+    { icon: "https://cdn.glitch.global/c16ac13c-9db1-4fbb-a599-4c729f45d485/a274e890-4257-4cd9-a02a-56bc80be47d3.image.png?v=1724334816902", rank: "Bronze III", divisions: ["600", "674"] },
+    { icon: "https://cdn.glitch.global/c16ac13c-9db1-4fbb-a599-4c729f45d485/9965effe-4989-4504-9200-7f04b6b665a2.image.png?v=1724334793116", rank: "Bronze II", divisions: ["500", "599"] },
+    { icon: "https://cdn.glitch.global/c16ac13c-9db1-4fbb-a599-4c729f45d485/939597fb-c29f-4607-9a76-9a6c5f1edf48.image.png?v=1724334781837", rank: "Bronze I", divisions: ["0", "499"] }
+];
+
+
 
     const tableBody = document.querySelector('#distribution-table tbody');
     distributionData.forEach(row => {
@@ -89,6 +102,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
 document.addEventListener('DOMContentLoaded', function () {
     const leaderboardTypeSelect = document.getElementById('leaderboard-type-select');
+    const leaderboardUrls = {
+        '1v1': 'https://api.neatqueue.com/api/leaderboard/1220373185397264425/1344081250125742173',
+        '2v2': 'https://api.neatqueue.com/api/leaderboard/1220373185397264425/1344081252025892904',
+        '3v3': 'https://api.neatqueue.com/api/leaderboard/1220373185397264425/1344089470672044092'
+    };
 
     // Function to fetch and display leaderboard data
     async function fetchLeaderboard(url, listId, type) {
@@ -144,6 +162,55 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    // Function to update all leaderboards
+    function updateAllLeaderboards() {
+        const leaderboardType = leaderboardTypeSelect.value;
+        fetchLeaderboard(leaderboardUrls['1v1'], 'leaderboard-list-1v1', leaderboardType);
+        fetchLeaderboard(leaderboardUrls['2v2'], 'leaderboard-list-2v2', leaderboardType);
+        fetchLeaderboard(leaderboardUrls['3v3'], 'leaderboard-list-3v3', leaderboardType);
+    }
+
+    // Function to calculate the next update time
+    function getNextUpdateTime() {
+        const now = new Date();
+        const minutes = now.getMinutes();
+        const nextUpdate = new Date(now);
+
+        if (minutes < 15) {
+            nextUpdate.setMinutes(15);
+        } else if (minutes < 30) {
+            nextUpdate.setMinutes(30);
+        } else if (minutes < 45) {
+            nextUpdate.setMinutes(45);
+        } else {
+            nextUpdate.setHours(now.getHours() + 1);
+            nextUpdate.setMinutes(0);
+        }
+
+        nextUpdate.setSeconds(0);
+        nextUpdate.setMilliseconds(0);
+        return nextUpdate;
+    }
+
+    // Function to update the countdown timer
+    function updateCountdown() {
+        const now = new Date();
+        const nextUpdate = getNextUpdateTime();
+        const diff = nextUpdate - now;
+
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+        document.getElementById('countdown').textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+
+        if (diff <= 0) {
+            updateAllLeaderboards();
+            setTimeout(updateCountdown, 1000);
+        } else {
+            setTimeout(updateCountdown, 1000);
+        }
+    }
+
     // Function to switch leaderboard tabs
     function switchLeaderboardTab(event) {
         const tabButtons = document.querySelectorAll('.leaderboard-tab-button');
@@ -158,11 +225,8 @@ document.addEventListener('DOMContentLoaded', function () {
         event.currentTarget.classList.add('active');
         document.getElementById(`leaderboard-${targetTab}`).classList.add('active');
 
-        // Fetch data for the selected leaderboard type
-        const leaderboardType = leaderboardTypeSelect.value;
-        fetchLeaderboard(`https://api.neatqueue.com/api/leaderboard/1220373185397264425/1344081250125742173`, 'leaderboard-list-1v1', leaderboardType);
-        fetchLeaderboard(`https://api.neatqueue.com/api/leaderboard/1220373185397264425/1344081252025892904`, 'leaderboard-list-2v2', leaderboardType);
-        fetchLeaderboard(`https://api.neatqueue.com/api/leaderboard/1220373185397264425/1344089470672044092`, 'leaderboard-list-3v3', leaderboardType);
+        // Update the leaderboard data for the selected tab
+        updateAllLeaderboards();
     }
 
     // Attach event listeners to leaderboard tab buttons
@@ -171,12 +235,13 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // Attach event listener to leaderboard type dropdown
-    leaderboardTypeSelect.addEventListener('change', () => {
-        const activeTabButton = document.querySelector('.leaderboard-tab-button.active');
-        if (activeTabButton) {
-            activeTabButton.click();
-        }
-    });
+    leaderboardTypeSelect.addEventListener('change', updateAllLeaderboards);
+
+    // Update leaderboards immediately on page load
+    updateAllLeaderboards();
+
+    // Start the countdown timer
+    updateCountdown();
 
     // Default to showing the 1v1 leaderboard
     document.querySelector('.leaderboard-tab-button[data-leaderboard="1v1"]').click();
@@ -381,6 +446,113 @@ document.addEventListener('DOMContentLoaded', function () {
             window.location.href = `support/${articleId}.html`; // Redirect to the specific article page
         });
     });
+});
+  document.addEventListener('DOMContentLoaded', function () {
+    const mmrRanges = [
+    { min: 0, max: 499, label: 'Bronze I [0-499]' },
+    { min: 500, max: 599, label: 'Bronze II [500-599]' },
+    { min: 600, max: 674, label: 'Bronze III [600-674]' },
+    { min: 675, max: 749, label: 'Silver I [675-749]' },
+    { min: 750, max: 824, label: 'Silver II [750-824]' },
+    { min: 825, max: 899, label: 'Silver III [825-899]' },
+    { min: 900, max: 974, label: 'Gold I [900-974]' },
+    { min: 975, max: 1049, label: 'Gold II [975-1049]' },
+    { min: 1050, max: 1124, label: 'Gold III [1050-1124]' },
+    { min: 1125, max: 1199, label: 'Diamond I [1125-1199]' },
+    { min: 1200, max: 1299, label: 'Diamond II [1200-1299]' },
+    { min: 1300, max: 1399, label: 'Diamond III [1300-1399]' },
+    { min: 1400, max: Infinity, label: 'Champion [1400+]' }
+];
+
+
+    const queueUrls = {
+        '1v1': 'https://api.neatqueue.com/api/leaderboard/1220373185397264425/1344081250125742173',
+        '2v2': 'https://api.neatqueue.com/api/leaderboard/1220373185397264425/1344081252025892904',
+        '3v3': 'https://api.neatqueue.com/api/leaderboard/1220373185397264425/1344089470672044092'
+    };
+
+    const ctx = document.getElementById('mmrDistributionChart').getContext('2d');
+    let mmrDistributionChart;
+
+    async function fetchLeaderboardData(url) {
+        try {
+            const response = await fetch(url, { headers: { 'accept': 'application/json' } });
+            const data = await response.json();
+            return data.alltime || [];
+        } catch (error) {
+            console.error('Error fetching leaderboard data:', error);
+            return [];
+        }
+    }
+
+    function countPlayersInRanges(players, ranges) {
+        const counts = new Array(ranges.length).fill(0);
+        players.forEach(player => {
+            const mmr = player.data.mmr;
+            for (let i = 0; i < ranges.length; i++) {
+                if (mmr >= ranges[i].min && mmr <= ranges[i].max) {
+                    counts[i]++;
+                    break;
+                }
+            }
+        });
+        return counts;
+    }
+
+    async function updateChart(queue) {
+        const players = await fetchLeaderboardData(queueUrls[queue]);
+        const counts = countPlayersInRanges(players, mmrRanges);
+
+        if (mmrDistributionChart) {
+            mmrDistributionChart.destroy();
+        }
+
+        mmrDistributionChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: mmrRanges.map(range => range.label),
+                datasets: [{
+                    label: `Number of Players (${queue})`,
+                    data: counts,
+                    backgroundColor: 'rgba(254, 88, 92, 0.6)',
+                    borderColor: 'rgba(254, 88, 92, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Number of Players'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'MMR Range'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    }
+                }
+            }
+        });
+    }
+
+    // Add event listener to the dropdown menu
+    document.getElementById('queue-select').addEventListener('change', function () {
+        const selectedQueue = this.value;
+        updateChart(selectedQueue);
+    });
+
+    // Initialize the chart with the default queue (1v1)
+    updateChart('1v1');
 });
 // Fetch data for all leaderboards
 fetchLeaderboard('https://api.neatqueue.com/api/leaderboard/1220373185397264425/1344081250125742173', 'leaderboard-list-1v1'); // 1v1
