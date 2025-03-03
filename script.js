@@ -40,7 +40,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
         tableBody.appendChild(tr);
     });
+ // Function to update the page title based on the active tab
+    function updatePageTitle(tabName) {
+        const tabTitleMap = {
+            'home': 'Home',
+            'leaderboards': 'Leaderboards',
+            'ranks': 'Ranks',
+            'support': 'Support',
+            'tournaments': 'Tournaments'
+        };
 
+        const tabTitle = tabTitleMap[tabName] || 'Blade League Tracker';
+        document.title = `Blade League Tracker | ${tabTitle}`;
+    }
     // Function to handle tab switching
     function openTab(event, tabName) {
         const tabContents = document.querySelectorAll('.tab-content');
@@ -57,12 +69,16 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById(tabName).classList.add('active');
         event.currentTarget.classList.add('active');
 
+        // Update the page title
+        updatePageTitle(tabName);
+
         // Show the first sub-tab by default
         const firstSubTab = document.querySelector(`#${tabName} .tab-button`);
         if (firstSubTab) {
             firstSubTab.click();
         }
     }
+
 
     // Function to handle sub-tab switching
     function openSubTab(event, subTabName) {
