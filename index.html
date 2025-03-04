@@ -80,7 +80,7 @@
                 <tr>
                     <th>Icon</th>
                     <th>Rank</th>
-                    <th>MMR Range (Min-Max)</th>
+                    <th>ELO Range (Min-Max)</th>
                 </tr>
             </thead>
             <tbody>
@@ -96,11 +96,14 @@
 <div id="leaderboard-timer" style="text-align: center; margin-top: 20px; font-size: 1.2rem; color: #fe585c;">
     Next update in: <span id="countdown">15:00</span>
 </div>
+  <div id="loading" class="loading-spinner" style="display: none;">
+    <div class="spinner"></div>
+</div>
     <!-- Leaderboard Tabs -->
     <div class="leaderboard-tabs">
-        <button class="leaderboard-tab-button active" data-leaderboard="1v1">1v1 Leaderboard</button>
-        <button class="leaderboard-tab-button" data-leaderboard="2v2">2v2 Leaderboard</button>
-        <button class="leaderboard-tab-button" data-leaderboard="3v3">3v3 Leaderboard</button>
+        <button class="leaderboard-tab-button active" data-leaderboard="1v1">1v1</button>
+        <button class="leaderboard-tab-button" data-leaderboard="2v2">2v2</button>
+        <button class="leaderboard-tab-button" data-leaderboard="3v3">3v3</button>
     </div>
 
     <!-- Leaderboard Type Dropdown -->
@@ -187,7 +190,7 @@
                 <h2>Other Articles</h2>
                 <div class="article-cards">
                     <div class="article-card">
-                        <h3>Understanding MMR</h3>
+                        <h3>Understanding ELO</h3>
                         <p>Everything you need to know about the Matchmaking Rating system.</p>
                     </div>
                 </div>
@@ -246,6 +249,32 @@ nav ul {
 
 nav ul li {
     margin: 0 20px;
+}
+  .loading-spinner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 1000;
+}
+
+.spinner {
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top: 4px solid #fe585c;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 /* Popup styles */
 .popup {
