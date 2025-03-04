@@ -124,59 +124,68 @@ document.addEventListener('DOMContentLoaded', function () {
         '3v3': 'https://api.neatqueue.com/api/leaderboard/1220373185397264425/1344089470672044092'
     };
 
-    // Function to fetch and display leaderboard data
     async function fetchLeaderboard(url, listId, type) {
-        try {
-            const response = await fetch(url, {
-                headers: { 'accept': 'application/json' }
-            });
-            const data = await response.json();
-            
-            const list = document.getElementById(listId);
+    const loadingSpinner = document.getElementById('loading');
+    const list = document.getElementById(listId);
+
+    // Show loading spinner
+    loadingSpinner.style.display = 'flex';
+    list.innerHTML = ''; // Clear the list before appending new data
+
+    try {
+        const response = await fetch(url, {
+            headers: { 'accept': 'application/json' }
+        });
+        const data = await response.json();
+
+        if (data.alltime && Array.isArray(data.alltime)) {
+            let sortedData;
+            if (type === 'ranked') {
+                sortedData = data.alltime.sort((a, b) => b.data.mmr - a.data.mmr);
+            } else if (type === 'all-time') {
+                sortedData = data.alltime.sort((a, b) => b.data.wins - a.data.wins);
+            }
+
+            // Clear the list before appending new data
             list.innerHTML = '';
-            
-            if (data.alltime && Array.isArray(data.alltime)) {
-                let sortedData;
+
+            sortedData.forEach((entry, index) => {
+                const listItem = document.createElement('li');
                 if (type === 'ranked') {
-                    sortedData = data.alltime.sort((a, b) => b.data.mmr - a.data.mmr);
+                    listItem.innerHTML = `
+                        <span>${index + 1}. ${entry.name}</span>
+                        <span>${Math.round(entry.data.mmr)} ELO</span>
+                    `;
                 } else if (type === 'all-time') {
-                    sortedData = data.alltime.sort((a, b) => b.data.wins - a.data.wins);
+                    listItem.innerHTML = `
+                        <span>${index + 1}. ${entry.name}</span>
+                        <span>Losses: ${entry.data.losses}</span>
+                        <span>Wins: ${entry.data.wins}</span>
+                    `;
                 }
 
-                sortedData.forEach((entry, index) => {
-                    const listItem = document.createElement('li');
-                    if (type === 'ranked') {
-                        listItem.innerHTML = `
-                            <span>${index + 1}. ${entry.name}</span>
-                            <span>${Math.round(entry.data.mmr)} MMR</span>
-                        `;
-                    } else if (type === 'all-time') {
-                        listItem.innerHTML = `
-                            <span>${index + 1}. ${entry.name}</span>
-                            <span>Losses: ${entry.data.losses}</span>
-                            <span>Wins: ${entry.data.wins}</span>
-                        `;
-                    }
+                // Apply different colors for top 3
+                if (index === 0) {
+                    listItem.querySelector('span').style.color = '#FFD700'; // Gold for #1
+                } else if (index === 1) {
+                    listItem.querySelector('span').style.color = '#C0C0C0'; // Silver for #2
+                } else if (index === 2) {
+                    listItem.querySelector('span').style.color = '#CD7F32'; // Bronze for #3
+                }
 
-                    // Apply different colors for top 3
-                    if (index === 0) {
-                        listItem.querySelector('span').style.color = '#FFD700'; // Gold for #1
-                    } else if (index === 1) {
-                        listItem.querySelector('span').style.color = '#C0C0C0'; // Silver for #2
-                    } else if (index === 2) {
-                        listItem.querySelector('span').style.color = '#CD7F32'; // Bronze for #3
-                    }
-
-                    list.appendChild(listItem);
-                });
-            } else {
-                list.textContent = 'No leaderboard data available';
-            }
-        } catch (error) {
-            console.error('Error fetching leaderboard:', error);
-            document.getElementById(listId).textContent = 'Failed to load leaderboard';
+                list.appendChild(listItem);
+            });
+        } else {
+            list.textContent = 'No leaderboard data available';
         }
+    } catch (error) {
+        console.error('Error fetching leaderboard:', error);
+        list.textContent = 'Failed to load leaderboard';
+    } finally {
+        // Hide loading spinner
+        loadingSpinner.style.display = 'none';
     }
+}
 
     // Function to update all leaderboards
     function updateAllLeaderboards() {
@@ -208,42 +217,43 @@ document.addEventListener('DOMContentLoaded', function () {
         return nextUpdate;
     }
 
-    // Function to update the countdown timer
     function updateCountdown() {
-        const now = new Date();
-        const nextUpdate = getNextUpdateTime();
-        const diff = nextUpdate - now;
+    const now = new Date();
+    const nextUpdate = getNextUpdateTime();
+    const diff = nextUpdate - now;
 
-        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
-        document.getElementById('countdown').textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    document.getElementById('countdown').textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 
-        if (diff <= 0) {
-            updateAllLeaderboards();
-            setTimeout(updateCountdown, 1000);
-        } else {
-            setTimeout(updateCountdown, 1000);
-        }
-    }
-
-    // Function to switch leaderboard tabs
-    function switchLeaderboardTab(event) {
-        const tabButtons = document.querySelectorAll('.leaderboard-tab-button');
-        const tabContents = document.querySelectorAll('.leaderboard-content');
-
-        // Remove active class from all buttons and content
-        tabButtons.forEach(button => button.classList.remove('active'));
-        tabContents.forEach(content => content.classList.remove('active'));
-
-        // Add active class to the clicked button and corresponding content
-        const targetTab = event.currentTarget.getAttribute('data-leaderboard');
-        event.currentTarget.classList.add('active');
-        document.getElementById(`leaderboard-${targetTab}`).classList.add('active');
-
-        // Update the leaderboard data for the selected tab
+    if (diff <= 0) {
         updateAllLeaderboards();
+        setTimeout(updateCountdown, 1000);
+    } else {
+        setTimeout(updateCountdown, 1000);
     }
+}
+
+    function switchLeaderboardTab(event) {
+    const tabButtons = document.querySelectorAll('.leaderboard-tab-button');
+    const tabContents = document.querySelectorAll('.leaderboard-content');
+
+    // Remove active class from all buttons and content
+    tabButtons.forEach(button => button.classList.remove('active'));
+    tabContents.forEach(content => content.classList.remove('active'));
+
+    // Add active class to the clicked button and corresponding content
+    const targetTab = event.currentTarget.getAttribute('data-leaderboard');
+    event.currentTarget.classList.add('active');
+    document.getElementById(`leaderboard-${targetTab}`).classList.add('active');
+
+    // Fetch and update the leaderboard data for the selected tab
+    const leaderboardType = document.getElementById('leaderboard-type-select').value;
+    const url = leaderboardUrls[targetTab];
+    const listId = `leaderboard-list-${targetTab}`;
+    fetchLeaderboard(url, listId, leaderboardType);
+}
 
     // Attach event listeners to leaderboard tab buttons
     document.querySelectorAll('.leaderboard-tab-button').forEach(button => {
@@ -378,12 +388,12 @@ function displayStats(data) {
             queueContainer.innerHTML = `
                 <h3>${queue}</h3>
                 <p><strong>Rank:</strong> ${Math.ceil(queueStats.rank)}</p>
-                <p><strong>MMR:</strong> ${Math.ceil(queueStats.mmr)}</p>
+                <p><strong>ELO:</strong> ${Math.ceil(queueStats.mmr)}</p>
                 <p><strong>Wins:</strong> ${Math.ceil(queueStats.wins)}</p>
                 <p><strong>Losses:</strong> ${Math.ceil(queueStats.losses)}</p>
                 <p><strong>Streak:</strong> ${Math.ceil(queueStats.streak)}</p>
                 <p><strong>Total Games:</strong> ${Math.ceil(queueStats.totalgames)}</p>
-                <p><strong>Peak MMR:</strong> ${Math.ceil(queueStats.peak_mmr)}</p>
+                <p><strong>Peak ELO:</strong> ${Math.ceil(queueStats.peak_mmr)}</p>
                 <p><strong>Peak Streak:</strong> ${Math.ceil(queueStats.peak_streak)}</p>
             `;
             queueStatsContainer.appendChild(queueContainer);
@@ -547,7 +557,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     x: {
                         title: {
                             display: true,
-                            text: 'MMR Range'
+                            text: 'ELO Range'
                         }
                     }
                 },
@@ -570,9 +580,20 @@ document.addEventListener('DOMContentLoaded', function () {
     // Initialize the chart with the default queue (1v1)
     updateChart('1v1');
 });
+  function startRealTimeUpdates(interval = 15000) {
+    setInterval(() => {
+        updateAllLeaderboards();
+    }, interval);
+}
+
+// Start real-time updates every 15 seconds
+startRealTimeUpdates();
 // Fetch data for all leaderboards
 fetchLeaderboard('https://api.neatqueue.com/api/leaderboard/1220373185397264425/1344081250125742173', 'leaderboard-list-1v1'); // 1v1
 fetchLeaderboard('https://api.neatqueue.com/api/leaderboard/1220373185397264425/1344081252025892904', 'leaderboard-list-2v2'); // 2v2
 fetchLeaderboard('https://api.neatqueue.com/api/leaderboard/1220373185397264425/1344089470672044092', 'leaderboard-list-3v3'); // 3v3
 
 fetchLeaderboard();
+  updateAllLeaderboards();
+    updateCountdown();
+    startRealTimeUpdates();
