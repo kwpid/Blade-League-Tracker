@@ -405,40 +405,145 @@ function displayStats(data) {
 }
 
 async function handleSearch() {
-    const userId = userIdInput.value.trim();
-    if (!userId) return alert("Please enter a User ID");
+    const usernameInput = document.getElementById('usernameInput');
+    const searchResults = document.getElementById('searchResults');
+    const username = usernameInput.value.trim();
 
-    // Disable the button and show loading animation
-    searchButton.textContent = "";
-    searchButton.classList.add("loading");
-    searchButton.disabled = true;
+    if (!username) {
+        searchResults.innerHTML = '<p class="error">Please enter a username</p>';
+        return;
+    }
 
     try {
-        const stats = await fetchPlayerStats(userId);
-        if (stats) {
-            displayStats(stats);
-        } else {
-            alert("No stats found for this user.");
+        const response = await fetch(`/search?query=${encodeURIComponent(username)}`);
+        const data = await response.json();
+
+        if (data.length === 0) {
+            searchResults.innerHTML = '<p class="error">No users found</p>';
+            return;
         }
+
+        // Create results list
+        const resultsList = document.createElement('div');
+        resultsList.className = 'results-list';
+
+        data.forEach(user => {
+            const userCard = document.createElement('div');
+            userCard.className = 'user-card';
+            userCard.innerHTML = `
+                <div class="user-info">
+                    ${user.thumbnail ? `<img src="${user.thumbnail}" alt="${user.username}'s avatar" class="user-avatar">` : ''}
+                    <div class="user-details">
+                        <h3>${user.displayName}</h3>
+                        <p>@${user.username}</p>
+                        <span class="status ${user.isOnline ? 'online' : 'offline'}">${user.isOnline ? 'Online' : 'Offline'}</span>
+                    </div>
+                </div>
+                <button onclick="fetchPlayerStats('${user.username}')" class="view-stats-btn">View Stats</button>
+            `;
+            resultsList.appendChild(userCard);
+        });
+
+        searchResults.innerHTML = '';
+        searchResults.appendChild(resultsList);
     } catch (error) {
-        console.error("Error fetching stats:", error);
-        alert("Failed to fetch stats. Please try again.");
-    } finally {
-        // Re-enable the button and revert to "Search"
-        searchButton.textContent = "Search";
-        searchButton.classList.remove("loading");
-        searchButton.disabled = false;
+        console.error('Search error:', error);
+        searchResults.innerHTML = '<p class="error">Error searching for users</p>';
     }
 }
 
-// Event listeners
-searchButton.addEventListener("click", handleSearch);
-userIdInput.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") handleSearch();
-});
+async function fetchPlayerStats(username) {
+    try {
+        const response = await fetch(`/getstats?username=${encodeURIComponent(username)}`);
+        const data = await response.json();
 
-closePopup.addEventListener("click", () => {
-    statsPopup.style.display = "none";
+        if (response.status === 404) {
+            alert('Player not found');
+            return;
+        }
+
+        displayStats(data);
+    } catch (error) {
+        console.error('Error fetching stats:', error);
+        alert('Error fetching player stats');
+    }
+}
+
+function displayStats(data) {
+    const popup = document.getElementById('statsPopup');
+    const statsContainer = document.getElementById('statsContainer');
+    
+    statsContainer.innerHTML = `
+        <div class="player-header">
+            ${data.thumbnail ? `<img src="${data.thumbnail}" alt="${data.username}'s avatar" class="player-avatar">` : ''}
+            <div class="player-info">
+                <h3>${data.displayName}</h3>
+                <p>@${data.username}</p>
+                <span class="status ${data.isOnline ? 'online' : 'offline'}">${data.isOnline ? 'Online' : 'Offline'}</span>
+            </div>
+        </div>
+        <div class="stats-grid">
+            <div class="stat-item">
+                <h4>Wins</h4>
+                <p>${data.stats.Wins}</p>
+            </div>
+            <div class="stat-item">
+                <h4>Losses</h4>
+                <p>${data.stats.Losses}</p>
+            </div>
+            <div class="stat-item">
+                <h4>Current Streak</h4>
+                <p>${data.stats.CurrentStreak}</p>
+            </div>
+            <div class="stat-item">
+                <h4>Highest Streak</h4>
+                <p>${data.stats.HighestStreak}</p>
+            </div>
+            <div class="stat-item">
+                <h4>1v1 ELO</h4>
+                <p>${data.stats.ELO_1v1}</p>
+            </div>
+            <div class="stat-item">
+                <h4>2v2 ELO</h4>
+                <p>${data.stats.ELO_2v2}</p>
+            </div>
+            <div class="stat-item">
+                <h4>3v3 ELO</h4>
+                <p>${data.stats.ELO_3v3}</p>
+            </div>
+            <div class="stat-item">
+                <h4>4v4 ELO</h4>
+                <p>${data.stats.ELO_4v4}</p>
+            </div>
+        </div>
+    `;
+
+    popup.style.display = 'block';
+}
+
+// Add event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    const searchButton = document.getElementById('searchButton');
+    const usernameInput = document.getElementById('usernameInput');
+    const closeButton = document.querySelector('.close');
+
+    searchButton.addEventListener('click', handleSearch);
+    usernameInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            handleSearch();
+        }
+    });
+
+    closeButton.addEventListener('click', function() {
+        document.getElementById('statsPopup').style.display = 'none';
+    });
+
+    window.addEventListener('click', function(event) {
+        const popup = document.getElementById('statsPopup');
+        if (event.target === popup) {
+            popup.style.display = 'none';
+        }
+    });
 });
 
 // Tab Switching on Card Click
